@@ -40,7 +40,7 @@ def post_update(request, slug):
     form = PostForm(request.POST or None, request.FILES or None, instance=obj)
     if form.is_valid():
         form.save()
-        return redirect("blog:list")
+        return redirect("blog:post-list")
     
     context = {
         "object": obj,
@@ -48,3 +48,14 @@ def post_update(request, slug):
     }
     
     return render(request, "blog/post_update.html", context)
+
+def post_delete(request, slug):
+    obj = get_object_or_404(Post, slug=slug)
+    if request.method == "POST":
+        obj.delete()
+        return redirect("blog:post-list")
+    context = {
+        "object": obj
+    }
+    
+    return render(request, "blog/post_delete.html", context)
