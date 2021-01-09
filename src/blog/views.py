@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from .models import Post, Like
 from .forms import PostForm, CommentForm
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 # Create your views here.
 
@@ -21,6 +22,7 @@ def post_create(request):
             post = form.save(commit = False)
             post.author = request.user
             post.save()
+            messages.success(request, "Post was created succesfully")
             return redirect("blog:post-list")
     context ={
         "form" : form
