@@ -15,3 +15,15 @@ def register(request):
 
 def profile(request):
     user_form = UserUpdateForm(request.POST or None, instance=request.user)
+    profile_form = ProfileUpdateForm(request.POST or None, request.FILES or None, instance = request.user.profile)
+    
+    if user_form.is_valid() and profile_form.is_valid():
+        user_form.save()
+        profile_form.save()
+        return redirect(request.path)
+    
+    context = {
+        "u_form": user_form,
+        "p_form": profile_form
+    }
+    return render(request, "users/profile.html", context)
