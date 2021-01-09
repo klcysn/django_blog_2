@@ -10,6 +10,8 @@ def register(request):
         return redirect("blog:post-list")
     if form.is_valid():
         form.save()
+        name = form.cleaned_data["username"]
+        messages.success(request, "Your account succesfully creataed for {}".format(name))
         return redirect("login")
     context = {
         "form": form
@@ -23,6 +25,7 @@ def profile(request):
     if user_form.is_valid() and profile_form.is_valid():
         user_form.save()
         profile_form.save()
+        messages.success(request, "Your account succesfully creataed for")
         return redirect(request.path)
     
     context = {
