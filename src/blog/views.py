@@ -52,10 +52,12 @@ def post_detail(request, slug):
 def post_update(request, slug):
     obj = get_object_or_404(Post, slug=slug)
     if request.user.id != obj.author.id:
+        messages.warning(request, "Post can not updated, You are not admin")
         return redirect("blog:post-list")
     form = PostForm(request.POST or None, request.FILES or None, instance=obj)
     if form.is_valid():
         form.save()
+        messages.success(request, "Post was updated succesfully")
         return redirect("blog:post-list")
     
     context = {
@@ -72,6 +74,7 @@ def post_delete(request, slug):
         return redirect("blog:post-list")
     if request.method == "POST":
         obj.delete()
+        messages.success(request, "Post was deleted succesfully")
         return redirect("blog:post-list")
     context = {
         "object": obj
@@ -80,11 +83,14 @@ def post_delete(request, slug):
     return render(request, "blog/post_delete.html", context)
 
 def like(request, slug):
-    if request.method == "POST":
-        obj = get_object_or_404(Post, slug=slug)
-        like_qs = Like.objects.filter(user=request.user, post=obj)
-        if like_qs.exists():
-            like_qs[0].delete()
-        else:
-            Like.objects.create(user=request.user, post=obj)
-        return redirect("blog:detail", slug=slug)
+    if request.POST["user"]:
+        if request.method == "POST":
+            obj = get_object_or_404(Post, slug=slug)
+            like_qs = Like.objects.filter(user=request.user, post=obj)
+            if like_qs.exists():
+                like_qs[0].delete()
+            else:
+                Like.objects.create(user=request.user, post=obj)
+            return redirect("blog:detail", slug=slug)
+    else:
+        return redirect("login")
