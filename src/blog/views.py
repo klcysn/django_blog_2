@@ -82,15 +82,14 @@ def post_delete(request, slug):
     
     return render(request, "blog/post_delete.html", context)
 
+@login_required()
 def like(request, slug):
-    if request.POST["user"]:
-        if request.method == "POST":
-            obj = get_object_or_404(Post, slug=slug)
-            like_qs = Like.objects.filter(user=request.user, post=obj)
-            if like_qs.exists():
-                like_qs[0].delete()
-            else:
-                Like.objects.create(user=request.user, post=obj)
-            return redirect("blog:detail", slug=slug)
-    else:
-        return redirect("login")
+    if request.method == "POST":
+        obj = get_object_or_404(Post, slug=slug)
+        like_qs = Like.objects.filter(user=request.user, post=obj)
+        if like_qs:
+            like_qs.delete()
+        else:
+            Like.objects.create(user=request.user, post=obj)
+        return redirect('blog:detail', slug=slug)
+    return redirect('login')
